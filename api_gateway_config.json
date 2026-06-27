@@ -1,0 +1,129 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "RoboAdvisorAPI",
+    "version": "1.0",
+    "description": "REST API for AI-Powered Robo Advisor — Build AI with AWS | June 2026"
+  },
+  "basePath": "/prod",
+  "schemes": ["https"],
+
+  "paths": {
+    "/portfolio": {
+      "post": {
+        "summary": "Generate optimised portfolio",
+        "description": "Accepts risk level, amount, horizon; returns ML + sentiment filtered portfolio with Bedrock explanation",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["risk", "amount", "horizon"],
+              "properties": {
+                "risk":    { "type": "string", "enum": ["low","medium","high"] },
+                "amount":  { "type": "number", "example": 10000 },
+                "horizon": { "type": "integer", "example": 5 }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Portfolio generated successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode":  { "type": "integer" },
+                "portfolio":   { "type": "object" },
+                "explanation": { "type": "string" }
+              }
+            }
+          },
+          "400": { "description": "Bad request — missing or invalid parameters" },
+          "500": { "description": "Internal server error" }
+        },
+        "x-amazon-apigateway-integration": {
+          "type": "aws_proxy",
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:ACCOUNT_ID:function:RoboAdvisorFunction/invocations",
+          "passthroughBehavior": "when_no_match"
+        }
+      },
+      "options": {
+        "summary": "CORS preflight",
+        "responses": { "200": { "description": "CORS headers" } },
+        "x-amazon-apigateway-integration": {
+          "type": "mock",
+          "requestTemplates": { "application/json": "{\"statusCode\": 200}" },
+          "responses": {
+            "default": {
+              "statusCode": "200",
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'",
+                "method.response.header.Access-Control-Allow-Origin":  "'*'"
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/performance": {
+      "get": {
+        "summary": "Fetch backtest performance metrics",
+        "description": "Returns ML strategy vs buy-and-hold benchmark returns (2022-2024)",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Performance metrics",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "ml_return":        { "type": "string" },
+                "benchmark_return": { "type": "string" },
+                "alpha":            { "type": "string" },
+                "model_accuracy":   { "type": "string" },
+                "explanation":      { "type": "string" }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "type": "aws_proxy",
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:ACCOUNT_ID:function:RoboAdvisorFunction/invocations"
+        }
+      }
+    },
+
+    "/health": {
+      "get": {
+        "summary": "Service health check",
+        "responses": {
+          "200": { "description": "Service is healthy" }
+        },
+        "x-amazon-apigateway-integration": {
+          "type": "aws_proxy",
+          "httpMethod": "POST",
+          "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:ACCOUNT_ID:function:RoboAdvisorFunction/invocations"
+        }
+      }
+    }
+  },
+
+  "deployment_steps": [
+    "1. Console → API Gateway → Create API → REST API → New API",
+    "2. API name: RoboAdvisorAPI | Endpoint type: Regional",
+    "3. Create Resources: /portfolio, /performance, /health",
+    "4. Add Methods: POST on /portfolio, GET on /performance, GET on /health",
+    "5. Integration type: Lambda Proxy → select RoboAdvisorFunction",
+    "6. Enable CORS on /portfolio",
+    "7. Deploy API → Stage name: prod",
+    "8. Note the Invoke URL for frontend or demo"
+  ]
+}

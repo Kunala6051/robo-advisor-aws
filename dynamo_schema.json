@@ -1,0 +1,46 @@
+{
+  "TableName": "RoboAdvisorPortfolios",
+  "BillingMode": "PAY_PER_REQUEST",
+  "TableClass": "STANDARD",
+
+  "AttributeDefinitions": [
+    { "AttributeName": "UserID",    "AttributeType": "S" },
+    { "AttributeName": "Timestamp", "AttributeType": "S" }
+  ],
+
+  "KeySchema": [
+    { "AttributeName": "UserID",    "KeyType": "HASH"  },
+    { "AttributeName": "Timestamp", "KeyType": "RANGE" }
+  ],
+
+  "Tags": [
+    { "Key": "Project",     "Value": "RoboAdvisor"    },
+    { "Key": "Course",      "Value": "BuildAIwithAWS"  },
+    { "Key": "Week",        "Value": "4"              },
+    { "Key": "Environment", "Value": "Production"     }
+  ],
+
+  "_schema_notes": {
+    "UserID":            "String — Lex session ID or hashed (risk+amount+horizon)",
+    "Timestamp":         "String — ISO-8601 UTC e.g. 2026-06-17T10:32:00+00:00",
+    "RiskLevel":         "String — low | medium | high (stored but not indexed)",
+    "Amount":            "String — Investment amount in USD (stored as string for DynamoDB compat)",
+    "Horizon":           "String — Time horizon in trading days",
+    "NumStocks":         "String — Number of stocks selected after sentiment filter",
+    "Stocks":            "String — JSON array of ticker symbols",
+    "WeightPerStock":    "String — USD allocated per stock",
+    "ModelVersion":      "String — e.g. RF-v1.0",
+    "SentimentFiltered": "String — 'true' if Comprehend filter was applied",
+    "SentimentReport":   "String — JSON array of per-ticker sentiment scores (optional)"
+  },
+
+  "deployment_steps": [
+    "1. Open AWS Console → DynamoDB → Tables → Create table",
+    "2. Table name: RoboAdvisorPortfolios",
+    "3. Partition key: UserID (String)",
+    "4. Sort key: Timestamp (String)",
+    "5. Capacity: On-demand (Pay per request)",
+    "6. Click Create table",
+    "7. Attach DynamoDB PutItem/GetItem/Query policy to LambdaRoboAdvisorRole"
+  ]
+}
