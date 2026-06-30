@@ -66,8 +66,8 @@ robo-advisor-aws/
 
 | Model | Features | Test Accuracy | Notes |
 |---|---|---|---|
-| Logistic Regression | 1/5/20-day returns, MA ratios, volatility | 52.3% | Baseline, interpretable |
-| **Random Forest** ✓ | Same 6 features | **55.1%** | **Selected — higher accuracy, better F1** |
+| Logistic Regression | 1/5/20-day returns, MA ratios, volatility | 52.8% | Baseline, interpretable |
+| **Random Forest** ✓ | Same 6 features | **52.6%** | **Selected — Better for Handling non-linear data** |
 
 **Features used:**
 - `ret_1d`, `ret_5d`, `ret_20d` — Short/medium/long-term returns
@@ -225,7 +225,7 @@ Lambda execution role needs:
 ## Performance Summary
 
 ```
-Random Forest Model  : 55.1% test accuracy (vs 50% random baseline)
+Random Forest Model  : 52.6% test accuracy (vs 50% random baseline)
 ML Strategy          : ~18% cumulative return (2022-2024)
 Buy & Hold Benchmark : ~12% cumulative return (2022-2024)
 Alpha Generated      : ~6%
